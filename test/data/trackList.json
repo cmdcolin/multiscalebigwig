@@ -1,0 +1,37 @@
+{
+  "plugins": [
+    "MultiBigWig",
+    "MultiScaleBigWig",
+    "HideTrackLabels"
+  ],
+  "tracks": [
+    {
+      "seqType": "dna",
+      "key": "Reference sequence",
+      "storeClass": "JBrowse/Store/Sequence/StaticChunked",
+      "chunkSize": 20000,
+      "urlTemplate": "seq/{refseq_dirpath}/{refseq}-",
+      "label": "DNA",
+      "type": "SequenceTrack",
+      "category": "Reference sequence"
+    },
+    {
+      "urlTemplates": [
+        {
+          "storeClass": "MultiScaleBigWig/Store/SeqFeature/MultiScaleBigWig",
+          "scales": {
+            "10": "volvox_microarray.bw",
+            "100": "volvox_microarray_smaller.bw"
+          },
+          "name": "multiscaletest"
+        }
+      ],
+      "type": "MultiBigWig/View/Track/MultiWiggle/MultiXYPlot",
+      "label": "multiscale",
+      "storeClass": "MultiBigWig/Store/SeqFeature/MultiBigWig"
+    }
+  ],
+  "formatVersion": 1,
+  "highResolutionMode": 2,
+  "classicMenu": true
+}
