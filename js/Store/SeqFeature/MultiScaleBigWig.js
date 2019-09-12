@@ -19,102 +19,47 @@ function (
     BigWig
 ) {
     return declare([SeqFeatureStore, DeferredFeaturesMixin, DeferredStatsMixin], {
-        constructor: function (args) {
-            var thisB = this;
-            this.scales = Object.keys(args.scales).forEach(urlTemplate => {
-                return new BigWig(dojo.mixin(args, { urlTemplate: urlTemplate.url, name: urlTemplate.name }));
+        constructor(args) {
+            this.scales = {};
+            Object.keys(args.scales).forEach(k => {
+                const v = args.scales[k];
+                this.scales[parseInt(k, 10)] = new BigWig(dojo.mixin(args, { urlTemplate: v, name: v }));
             });
-
-            Promise.all(this.scales.map(store =>
-                store._deferred.features;
-            )).then(function () {
-                thisB._deferred.features.resolve({success: true});
-                thisB._deferred.stats.resolve({success: true});
-            },
-            lang.hitch(this, '_failAllDeferred'));
+            Promise.all(Object.values(this.scales).map(store =>
+                store._deferred.features
+            )).then(() => {
+                this._deferred.features.resolve({success: true});
+                this._deferred.stats.resolve({success: true});
+            }).catch(e =>
+                this._failAllDeferred(e)
+            );
         },
+
 
         _getFeatures: function (query, featureCallback, endCallback, errorCallback) {
-            var thisB = this;
-            var finished = 0;
-            var finishCallback = function () {
-                if (thisB.stores.length === ++finished) {
-                    endCallback();
+            const zoom = Math.floor(query.basesPerSpan * 1000);
+            const arr = Object.keys(this.scales);
+            let selected = arr[0];
+            for (let i = arr.length - 1; i > 0; i--) {
+                if (zoom > +arr[i]) {
+                    selected = arr[i];
+                    break;
                 }
-            };
-            array.forEach(this.stores, function (store) {
-                var f = (function(name) {
-                    return function(feat) {
-                        feat.data.source = name;
-                        featureCallback(feat);
-                    }
-                })(store.name)
-                store._getFeatures(query,
-                    f, finishCallback, errorCallback
-                );
-            });
+            }
+            this.scales[selected]._getFeatures(query, featureCallback, endCallback, errorCallback);
         },
-
-        getIndividualStats: function (successCallback, errorCallback) {
-            var thisB = this;
-            var finished = 0;
-            var stats = {};
-
-            array.forEach(this.stores, function (store) {
-                store._getGlobalStats((function (name) {
-                    return function (t) {
-                        stats[name] = t;
-                        if (thisB.stores.length === ++finished) {
-                            successCallback(stats);
-                        }
-                    };
-                })(store.name), errorCallback);
-            });
+        _getGlobalStats(successCallback, errorCallback) {
+            const arr = Object.keys(this.scales);
+            this.scales[arr[0]]._getGlobalStats(successCallback, errorCallback);
         },
-        _getGlobalStats: function (successCallback, errorCallback) {
-            var thisB = this;
-            var finished = 0;
-            var stats = { scoreMin: 100000000, scoreMax: -10000000 };
-
-            var finishCallback = function (t) {
-                if (t.scoreMin < stats.scoreMin) {
-                    stats.scoreMin = t.scoreMin;
-                }
-                if (t.scoreMax > stats.scoreMax) {
-                    stats.scoreMax = t.scoreMax;
-                }
-                if (thisB.stores.length === ++finished) {
-                    successCallback(stats);
-                }
-            };
-            array.forEach(this.stores, function (store) {
-                store._getGlobalStats(finishCallback, errorCallback);
-            });
-        },
-        getRegionStats: function (query, successCallback, errorCallback) {
-            var thisB = this;
-            var finished = 0;
-            var stats = { scoreMin: 100000000, scoreMax: -10000000 };
-
-            var finishCallback = function (t) {
-                if (t.scoreMin < stats.scoreMin) {
-                    stats.scoreMin = t.scoreMin;
-                }
-                if (t.scoreMax > stats.scoreMax) {
-                    stats.scoreMax = t.scoreMax;
-                }
-                if (thisB.stores.length === ++finished) {
-                    successCallback(stats);
-                }
-            };
-            array.forEach(this.stores, function (store) {
-                store.getRegionStats(query, finishCallback, errorCallback);
-            });
+        getRegionStats(query, successCallback, errorCallback) {
+            const arr = Object.keys(this.scales);
+            this.scales[arr[0]].getRegionStats(query, successCallback, errorCallback);
         },
 
         saveStore: function () {
             return {
-                urlTemplates: this.config.urlTemplates
+                scales: this.config.scales
             };
         }
     });
