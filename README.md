@@ -1,8 +1,7 @@
 # multiscalebigwig
 
-[![](https://travis-ci.org/cmdcolin/multiscalebigwig.svg?branch=master)](https://travis-ci.org/cmdcolin/multiscalebigwig)
 
-A JBrowse plugin with a storeclass that takes an array of bigwig files that are specified for different scales
+A JBrowse plugin with a storeClass that takes an array of bigwig files that are specified for different scales
 
 
 ## Example configs
@@ -12,28 +11,37 @@ Example for trackList.json
       {
          "storeClass" : "MultiScaleBigWig/Store/SeqFeature/MultiScaleBigWig",
          "scales" : {
-            "100": {"url":"bw/100bp.bw"},
-            "10000": {"url":"bw/10000bp.bw"},
-            "1000000": {"url":"bw/1000000bp.bw"},
+            "100": "bw/100bp.bw",
+            "10000": "bw/10000bp.bw",
+            "1000000": "bw/1000000bp.bw",
          ],
          "showTooltips": true,
          "label" : "MultiScaleBigWig",
          "type" : "JBrowse/View/Track/Wiggle/XYPlot"
       }
 
+Integration with MultiBigWig
 
-## Options
+    {
+      "urlTemplates": [
+        {
+          "storeClass": "MultiScaleBigWig/Store/SeqFeature/MultiScaleBigWig",
+          "scales": {
+            "10": "volvox_microarray.bw",
+            "100": "volvox_microarray_smaller.bw"
+          },
+          "name": "multiscaletest"
+        }
+      ],
+      "type": "MultiBigWig/View/Track/MultiWiggle/MultiXYPlot",
+      "label": "multiscale",
+      "storeClass": "MultiBigWig/Store/SeqFeature/MultiBigWig"
+    }
 
 
-### Main configuration
+## Caveat
 
-* scales - An object of different scales, containing the url for a BW file
-
-Example
-
-    "scales": [
-        { "url": "sample1.bw" }
-    ]
+Stats are estimated from the first scale or lowest in the list of scales, so the bigwigs should not be radically different across different scales
 
 ## Install
 
