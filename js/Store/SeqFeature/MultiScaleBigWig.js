@@ -35,9 +35,8 @@ function (
             );
         },
 
-
-        _getFeatures: function (query, featureCallback, endCallback, errorCallback) {
-            const zoom = Math.floor(query.basesPerSpan * 1000);
+        _getSelectedScale: function(query,x) {
+            const zoom = Math.floor(1/query.basesPerSpan * 1000);
             const arr = Object.keys(this.scales);
             let selected = arr[0];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -46,15 +45,18 @@ function (
                     break;
                 }
             }
-            this.scales[selected]._getFeatures(query, featureCallback, endCallback, errorCallback);
+            //console.log(selected,x,query)
+            return this.scales[selected]
+        },
+        _getFeatures: function (query, featureCallback, endCallback, errorCallback) {
+            this._getSelectedScale(query,'getfeats')._getFeatures(query, featureCallback, endCallback, errorCallback);
         },
         _getGlobalStats(successCallback, errorCallback) {
             const arr = Object.keys(this.scales);
             this.scales[arr[0]]._getGlobalStats(successCallback, errorCallback);
         },
         getRegionStats(query, successCallback, errorCallback) {
-            const arr = Object.keys(this.scales);
-            this.scales[arr[0]].getRegionStats(query, successCallback, errorCallback);
+            this._getSelectedScale(query,'region').getRegionStats(query, successCallback, errorCallback);
         },
 
         saveStore: function () {
