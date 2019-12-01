@@ -36,7 +36,8 @@ function (
         },
 
         _getSelectedScale: function(query,x) {
-            const zoom = Math.floor(1/query.basesPerSpan * 1000);
+            let zoom = query.basesPerSpan ?
+                 Math.floor(query.basesPerSpan):1/query.scale
             const arr = Object.keys(this.scales);
             let selected = arr[0];
             for (let i = arr.length - 1; i > 0; i--) {
