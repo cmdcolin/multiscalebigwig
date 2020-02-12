@@ -50,14 +50,15 @@ function (
             return this.scales[selected]
         },
         _getFeatures: function (query, featureCallback, endCallback, errorCallback) {
-            this._getSelectedScale(query,'getfeats')._getFeatures(query, featureCallback, endCallback, errorCallback);
+            this._getSelectedScale(query,'getfeats')._getFeatures(Object.assign({}, query, {scale:undefined,basesPerSpan:undefined}), featureCallback, endCallback, errorCallback);
         },
         _getGlobalStats(successCallback, errorCallback) {
             const arr = Object.keys(this.scales);
             this.scales[arr[0]]._getGlobalStats(successCallback, errorCallback);
         },
         getRegionStats(query, successCallback, errorCallback) {
-            this._getSelectedScale(query,'region').getRegionStats(query, successCallback, errorCallback);
+
+            this._getSelectedScale(query,'region').getRegionStats(Object.assign({}, query, {scale:undefined,basesPerSpan:undefined}), successCallback, errorCallback);
         },
 
         saveStore: function () {
