@@ -35,9 +35,9 @@ function (
             );
         },
 
-        _getSelectedScale: function(query,x) {
+        _getSelectedScale: function (query) {
             let zoom = query.basesPerSpan ?
-                 Math.floor(query.basesPerSpan):1/query.scale
+                Math.floor(query.basesPerSpan) : 1 / query.scale;
             const arr = Object.keys(this.scales);
             let selected = arr[0];
             for (let i = arr.length - 1; i > 0; i--) {
@@ -46,19 +46,18 @@ function (
                     break;
                 }
             }
-            //console.log(selected,x,query)
-            return this.scales[selected]
+            // console.log(selected,x,query)
+            return this.scales[selected];
         },
         _getFeatures: function (query, featureCallback, endCallback, errorCallback) {
-            this._getSelectedScale(query,'getfeats')._getFeatures(Object.assign({}, query, {scale:undefined,basesPerSpan:undefined}), featureCallback, endCallback, errorCallback);
+            this._getSelectedScale(query, 'getfeats')._getFeatures(Object.assign({}, query, {scale: undefined, basesPerSpan: undefined}), featureCallback, endCallback, errorCallback);
         },
         _getGlobalStats(successCallback, errorCallback) {
             const arr = Object.keys(this.scales);
             this.scales[arr[0]]._getGlobalStats(successCallback, errorCallback);
         },
         getRegionStats(query, successCallback, errorCallback) {
-
-            this._getSelectedScale(query,'region').getRegionStats(Object.assign({}, query, {scale:undefined,basesPerSpan:undefined}), successCallback, errorCallback);
+            this._getSelectedScale(query, 'region').getRegionStats(Object.assign({}, query, {scale: undefined, basesPerSpan: undefined}), successCallback, errorCallback);
         },
 
         saveStore: function () {
